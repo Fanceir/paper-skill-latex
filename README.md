@@ -1,20 +1,27 @@
-# LaTeX Agent `SKILL` (arXiv ML/AI Review Papers)
+# LaTeX Agent `SKILL`s for Papers (Writing + Figures)
 
 English · [简体中文](README.zh-CN.md)
 
 > [!NOTE]
-> This repo implements a `.codex` `SKILL`: an end-to-end, issues-driven workflow that scaffolds an **IEEEtran two-column LaTeX project** for **ML/AI review articles on arXiv.org**, with **verified BibTeX citations**.
+> This repo implements `.codex` `SKILL`s for paper production: an end-to-end, issues-driven workflow for **ML/AI review papers on arXiv.org** and a companion skill that turns a codebase into **paper-ready figure prompts** for draw.io, Excalidraw, and TikZ.
 > Experimental Claude Code support is provided via `.claude` → `.codex`.
 
 ## What’s in here
 
 - **End-to-end workflow**: issues-driven paper writing (plan generation → user approval → issues CSV generation → per-issue writing → rhythm refinement → QA/compile).
-- **Primary `SKILL`**: `arxiv-paper-writer` at `.codex/skills/arxiv-paper-writer/SKILL.md`.
-- **Helper scripts**: scaffolding, planning, validation, compilation under `.codex/skills/arxiv-paper-writer/scripts/`.
+- **Writing `SKILL`**: `arxiv-paper-writer` at `.codex/skills/arxiv-paper-writer/SKILL.md` for IEEEtran-based ML/AI review articles with verified BibTeX citations.
+- **Figure `SKILL`**: `paper-diagram-prompter` at `.codex/skills/paper-diagram-prompter/SKILL.md` for architecture, pipeline, model, and evaluation diagrams derived from a repo.
+- **Supporting assets**: helper scripts under `.codex/skills/arxiv-paper-writer/scripts/` and diagram cookbooks under `.codex/skills/paper-diagram-prompter/references/`.
 - **Example output**: a generated paper in `example/` (including `example/main.pdf`).
 
 > [!NOTE]
 > The workflow is inspired by “issue-driven development” as demonstrated by the [`appautomaton/agent-designer`](https://github.com/appautomaton/agent-designer) project.
+
+## Available skills
+
+- `arxiv-paper-writer`: generates an IEEEtran LaTeX review-paper project, enforces the plan/issues gate, verifies citations, and compiles the paper.
+- `paper-diagram-prompter`: scans a source repo and emits figure-ready text artifacts in three parallel formats: draw.io XML or fallback spec, Excalidraw scene descriptor or Mermaid, and compilable TikZ.
+- The two skills are designed to pair well: write the manuscript with `arxiv-paper-writer`, then generate figures from the implementation repo with `paper-diagram-prompter`.
 
 ## Quickstart (2 prompts → a compiled example paper)
 
@@ -46,9 +53,29 @@ In this example, the second prompt is intentionally vague (and the plan question
 > [!NOTE]
 > See the result in `example/main.tex`, `example/ref.bib`, and `example/main.pdf`.
 
+## Quickstart (repo → figure prompts)
+
+Use `paper-diagram-prompter` when you already have a codebase and want paper figures instead of prose.
+
+### Prompt example
+
+```text
+scan this repo and generate paper-ready figure prompts for draw.io, Excalidraw, and TikZ
+```
+
+The skill will:
+- inspect the repo structure and detect whether it is ML/AI, frontend/web, or algorithm/systems,
+- propose figures such as system overview, module graph, data pipeline, training/inference loop, or evaluation plots,
+- emit paste-ready text outputs for draw.io, Excalidraw, and TikZ,
+- keep the process text-only and avoid rendering or exporting images.
+
+> [!TIP]
+> Ask it to save the report if you want a Markdown artifact under `diagrams/<date>-<project>-prompts.md`. Otherwise it prints the report inline.
+
 ## Environment notes
 
 > [!IMPORTANT]
 > A working LaTeX environment is required (e.g., `pdflatex` + `bibtex`, or `latexmk`).
 
 - Tested on macOS with GPT-5.2 (Extra High).
+- `paper-diagram-prompter` is text-only. It does not require draw.io, Excalidraw, or image-export tooling unless you choose to paste/render the generated outputs yourself.
